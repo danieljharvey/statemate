@@ -7,7 +7,8 @@
   "scripts": {
     "test": "jest",
     "run": "ts-node ./src/index.ts",
-    "prepublishOnly": "tsc -p ./ --outDir dist/"
+    "prepublishOnly": "tsc -p ./ --outDir dist/",
+    "tsc": "tsc"
   },
   "author": "Daniel J Harvey",
   "license": "MIT",

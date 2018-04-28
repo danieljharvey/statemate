@@ -1,4 +1,4 @@
-import { Data } from '../src/index'
+import { Data } from '../index'
 
 interface TestObject {
     firstName: string
