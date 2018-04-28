@@ -1,19 +1,37 @@
 {
   "name": "data-blob",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A basic mappable type for expressing loaded API data",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "run": "ts-node ./src/index.ts",
     "prepublishOnly": "tsc -p ./ --outDir dist/"
   },
   "author": "Daniel J Harvey",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^22.2.3",
     "ts-jest": "^22.4.4",
     "ts-node": "^6.0.1",
     "typescript": "^2.8.3"
+  },
+  "dependencies": {
+    "jest": "^22.4.3"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }

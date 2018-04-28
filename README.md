@@ -159,11 +159,11 @@ This is mostly inspired by how much I am enjoying programming in [ReasonML](http
 
 ## Tests
 
-They're coming soon, I'm usually really on this but not today.
+Needs more though
 
 ## Roadmap
 
-1. Tests
+1. More tests
 2. Bind (I started it, the types got messy, I gave up, forgive me)
 3. Profit
 
