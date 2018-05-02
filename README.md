@@ -1,30 +1,28 @@
-# Data-blob
-
-## (What a terrible name, suggestions please)
+# Statemate
 
 ## What?
-The idea of this library is to reduce a load of boilerplate and unnecesary fiddling about when dealing with loading data from endpoints.
+The idea of this library is to reduce a load of boilerplate and unnecesary fiddling about when dealing with data that can be in a number of states.
 It does this by capturing all states in one object. This allows for two things:
 1. Less items in your data model that need passing around and dealing with
 2. No getting into weird states (so `isLoading` is true, but so is `didError`, so what do I display?) - inspired by Richard Feldman's excellent [Making Impossible States Impossible](https://www.youtube.com/watch?v=IcgmSRJHu_8)
 
 ## Why?
-Basically I've been using ReasonML a lot recently and realised capturing data in Sum types and pattern matching over them saves so much time and repeated lines of code. This whole library is just a way of doing:
+Basically I've been using ReasonML a lot recently and realised capturing data in Sum types and pattern matching over them saves so much time and repeated lines of code. This library hopes to capture common reusable patterns. The first object, Response, is just a way of doing:
 ```ocaml
-type data('a) = Empty | Loading | LoadError | Ready('a)
+type respomse('a) = Empty | Loading | LoadError | Ready('a)
 ```
 Where 'a represents whatever type of data you like.
 
 ## How do I use it?
-Install with `npm install data-blob`
+Install with `npm install statemate`
 
-Import into your code with `import { Data } from 'data-blob'`
+Import into your code with `import { Response } from 'statemate'`
 
 The library isn't limited to use in reducers, but it's a good example. Here is your initial state, for instance:
 ```javascript
 const initialState = {
     title: "Great reducer!",
-    apiData: Data.empty()
+    apiResponse: Response.empty()
 }
 ```
 
@@ -33,26 +31,26 @@ Now the change functions are as simple as
 case REQUESTING_DATA:
     return {
         ...state,
-        apiData: Data.loading()
+        apiResponse: Response.loading()
     }
 case RECEIVED_DATA_OK:
     return {
         ...state,
-        apiData: Data.ready(action.payload.data)
+        apiResponse: Response.ready(action.payload.data)
     }
 case RECEIVED_DATA_FAILED:
     return {
         ...state,
-        apiData: Data.loadError()
+        apiResponse: Response.loadError()
     }
 ```
 
-## How do I get to the data then?
+## How do I get to the actual data then?
 A couple of ways. Either using caseOf to do a sort of pattern matching on it:
 
 ### caseOf
 ```javascript
-const reply = datablob.caseOf({
+const reply = myResponse.caseOf({
     ready: (data) => {
         return data;
     },
@@ -66,8 +64,8 @@ const reply = datablob.caseOf({
         return "sorry, there was an error"
     }
 })
-// if datablob is Data.ready("Excellent!") this would return "Excellent!"
-// if datablob is Data.empty() this would return "this is empty, nothing has happened, maybe we will die waiting"
+// if myResponse is Response.ready("Excellent!") this would return "Excellent!"
+// if myResponse is Response.empty() this would return "this is empty, nothing has happened, maybe we will die waiting"
 // and so on...
 ```
 Now `reply` will equal either the data or one of various alternatives.
@@ -76,11 +74,11 @@ Now `reply` will equal either the data or one of various alternatives.
 Most of the time in UI rendering you won't need that much granularity, so use:
 ```javascript
 // returns data...
-const great = Data.ready("great").valueOr("No");
+const great = Response.ready("great").valueOr("No");
 // great = "great"
 
 // returns default...
-const reply = Data.loading().valueOr("Nah");
+const reply = Response.loading().valueOr("Nah");
 // reply = "Nah"
 ```
 This will return either the data inside or the default.
@@ -92,61 +90,61 @@ You can also map over the data. This works much like mapping over a Maybe or Eit
 const toUpper = (str) => {
     return str.toUpperCase();
 }
-const loudDataBlob = data.ready('dog').map(toUpper);
-// loudDataBlob = Data.ready('DOG')
+const loudResponseBlob = data.ready('dog').map(toUpper);
+// loudResponseBlob = Response.ready('DOG')
 const notReadyBlob = data.loading().map(toUpper);
-// notReadyBlob = Data.loading()
+// notReadyBlob = Response.loading()
 ```
 
 ## Other things
-Often waiting for multiple endpoints to return and dealing with checking this is a pain, so there is also sequencing functions for combining Data objects.
+Often waiting for multiple endpoints to return and dealing with checking this is a pain, so there is also sequencing functions for combining Response objects.
 
 ```javascript
 // some data objects
-const goodData = Data.ready("yeah!")
-const badData = Data.loading();
+const goodResponse = Response.ready("yeah!")
+const badResponse = Response.loading();
 
 // are they both ready?
-const allData = Data.sequence([goodData, badData]);
+const allResponse = Response.sequence([goodResponse, badResponse]);
 
 // nope
-// allData = Data.empty();
+// allResponse = Response.empty();
 
 // some better data objects
-const greatData = Data.ready("Absolutely")
-const betterData = Data.ready("wonderful")
+const greatResponse = Response.ready("Absolutely")
+const betterResponse = Response.ready("wonderful")
 
 // are these ones ready?
-const excellentData = Data.sequence([greatData, betterData]);
+const excellentResponse = Response.sequence([greatResponse, betterResponse]);
 
 // yes!
-// excellentData = Data.ready(["Absolutely","wonderful"])
+// excellentResponse = Response.ready(["Absolutely","wonderful"])
 ```
 
 Ending up with this stuff inside an array can also seem somewhat meaningless, so there is an object version:
 ```javascript
-// an object with Data in it
+// an object with Response in it
 const stuff = {
-    name: Data.empty(),
-    date: Data.ready('2018-01-01')
+    name: Response.empty(),
+    date: Response.ready('2018-01-01')
 }
 // all ready yet?
-const allStuff = Data.sequenceObj(stuff)
+const allStuff = Response.sequenceObj(stuff)
 
 // nope
-// allStuff = Data.empty()
+// allStuff = Response.empty()
 
-// an object with ready Data in it
+// an object with ready Response in it
 const betterStuff = {
-    name: Data.ready("Agent Dale Cooper"),
-    date: Data.ready('2018-01-01')
+    name: Response.ready("Agent Dale Cooper"),
+    date: Response.ready('2018-01-01')
 }
 // ready now?
-const readyStuff = Data.sequenceObj(betterStuff)
+const readyStuff = Response.sequenceObj(betterStuff)
 
 // excellent stuff!
 /*
-readyStuff = Data.ready({
+readyStuff = Response.ready({
     name: "Agent Dale Cooper",
     date: "2018-01-01"
 })
@@ -164,8 +162,9 @@ Needs more though
 ## Roadmap
 
 1. More tests
-2. Bind (I started it, the types got messy, I gave up, forgive me)
-3. Profit
+2. Objects other than 'Response' should sensible ones present themselves
+3. Bind (I started it, the types got messy, I gave up, forgive me)
+4. Profit
 
 ## Contributors
 
