@@ -9,7 +9,7 @@ It does this by capturing all states in one object. This allows for two things:
 ## Why?
 Basically I've been using ReasonML a lot recently and realised capturing data in Sum types and pattern matching over them saves so much time and repeated lines of code. This library hopes to capture common reusable patterns. The first object, Response, is just a way of doing:
 ```ocaml
-type respomse('a) = Empty | Loading | LoadError | Ready('a)
+type response('a) = Empty | Loading | LoadError | Ready('a)
 ```
 Where 'a represents whatever type of data you like.
 
